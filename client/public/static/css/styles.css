@@ -1,0 +1,13 @@
+#nprogress .bar {
+    height: 4px !important;
+    background: red !important;
+}
+
+.nav li{
+    width: fit-content;
+}
+
+
+.nav a{
+    color: white;
+}
