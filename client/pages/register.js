@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const Register = () => {
     const [state, setState] = useState({
@@ -18,17 +19,30 @@ const Register = () => {
         setState({ ...state, [name]: e.target.value, error: '', success: '', buttonText: 'Register' });
     };
 
-    const handleSubmit = e => {
-        e.preventDefault();
+    const handleSubmit = async e => {
+       try{ e.preventDefault();
         // console.table({ name, email, password });
-        axios
+        const response =await axios
             .post(`http://localhost:5000/api/register`, {
                 name,
                 email,
                 password
             })
-            .then(response => console.log(response))
-            .catch(error => console.log(error));
+            Swal.fire('congrates', response.data ,'success')
+                setState({
+                    name: '',
+                    email: '',
+                    password: '',
+                    error: '',
+                    success: '',
+                    buttonText: 'submitted'
+                })
+            }
+        catch(error)
+        {
+            console.log(error)
+            Swal.fire('Oops', error.response.data,'error')
+        }
     };
 
     const registerForm = () => (

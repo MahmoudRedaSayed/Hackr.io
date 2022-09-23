@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import {logout,isAuth} from "../helpers/auth"
 
 Router.onRouteChangeStart = url => NProgress.start();
 Router.onRouteChangeComplete = url => NProgress.done();
@@ -31,16 +32,44 @@ const Layout = ({ children }) => {
                 </Link>
             </li>
             </div>
-            <li className="nav-item">
-                <Link href="/login">
-                    <a className="nav-link ">Login</a>
-                </Link>
-            </li>
-            <li className="nav-item">
-                <Link href="/register">
-                    <a className="nav-link ">Register</a>
-                </Link>
-            </li>
+            {!isAuth() && (
+                <div style={{display:'flex'}}>
+                    <li className="nav-item">
+                        <Link href="/login">
+                            <a className="nav-link ">Login</a>
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link href="/register">
+                            <a className="nav-link ">Register</a>
+                        </Link>
+                    </li>
+                </div>
+            )}
+
+            {isAuth() && isAuth().role === 'admin' && (
+                <li className="nav-item ml-auto">
+                    <Link href="/admin">
+                        <a className="nav-link ">{isAuth().name}</a>
+                    </Link>
+                </li>
+            )}
+
+            {isAuth() && isAuth().role === 'subscriber' && (
+                <li className="nav-item ml-auto">
+                    <Link href="/user">
+                        <a className="nav-link ">{isAuth().name}</a>
+                    </Link>
+                </li>
+            )}
+
+            {isAuth() && (
+                <li className="nav-item">
+                    <a onClick={logout} className="nav-link ">
+                        Logout
+                    </a>
+                </li>
+            )}
         </ul>
     );
 
