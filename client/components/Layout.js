@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import React, { useEffect } from 'react';
 import {logout,isAuth} from "../helpers/auth"
 
 Router.onRouteChangeStart = url => NProgress.start();
@@ -10,8 +11,10 @@ Router.onRouteChangeComplete = url => NProgress.done();
 Router.onRouteChangeError = url => NProgress.done();
 
 const Layout = ({ children }) => {
-    const head = () => (
-        <>
+    
+    const head = () => {
+        return (
+        <React.Fragment>
             <link
                 rel="stylesheet"
                 href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -19,10 +22,14 @@ const Layout = ({ children }) => {
                 crossOrigin="anonymous"
             />
             <link rel="stylesheet" href="/static/css/styles.css" />
-        </>
-    );
+        </React.Fragment>
+    )};
 
-    const nav = () => (
+    const nav = () => {
+        // if (typeof window === 'undefined') {
+        //     return null;
+        //   }
+        return(
         <ul className="nav nav-tabs nav-dark bg-dark" style={{padding:"10px"}}>
             <div style={{flexGrow:'1'}}>
 
@@ -32,7 +39,8 @@ const Layout = ({ children }) => {
                 </Link>
             </li>
             </div>
-            {!isAuth() && (
+            {!isAuth()&&(
+                <React.Fragment>
                 <div style={{display:'flex'}}>
                     <li className="nav-item">
                         <Link href="/login">
@@ -45,6 +53,7 @@ const Layout = ({ children }) => {
                         </Link>
                     </li>
                 </div>
+                </React.Fragment>
             )}
 
             {isAuth() && isAuth().role === 'admin' && (
@@ -71,12 +80,12 @@ const Layout = ({ children }) => {
                 </li>
             )}
         </ul>
-    );
+    )};
 
     return (
-        <>
+        <React.Fragment>
             {head()} {nav()} <div className="container pt-5 pb-5">{children}</div>
-        </>
+        </React.Fragment>
     );
 };
 

@@ -5,6 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const ConnectDB=require("./config/db");
 const AuthRouter = require('./routes/auth');
+const UsersRouter = require('./routes/user');
 require('dotenv').config();
 
 const app=express();
@@ -16,3 +17,4 @@ app.listen(port,()=>{
     console.log("running on port 5000")
 })
 app.use("/api",AuthRouter)
+app.use("/api/users",UsersRouter)

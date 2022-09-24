@@ -1,3 +1,7 @@
-export default function index(){
-    return<div>Admin screen</div>
-}
+
+import withAdmin from '../withadmin';
+import Layout from '../../components/Layout';
+
+const User = ({ user }) => <Layout>{JSON.stringify(user)}</Layout>;
+
+export default withAdmin(User);
