@@ -136,3 +136,96 @@ exports.userLogin=async (req,res)=>
     }
    
 }
+
+
+
+exports.forgotPassword = async(req, res) => {
+    const { email } = req.body;
+    // check if user exists with that email
+    const user=await User.findOne({email})
+    if(!user)
+    {
+        res.status(400).json({
+            error: 'the user is not found'
+        });
+    }
+    else
+    {
+        const token = JWT.sign({ name: user.name }, process.env.LOGIN_USER, { expiresIn: '10m' });
+        // send email
+        // user.resetPasswordLink=token;
+        await User.findByIdAndUpdate(user._id,{resetPasswordLink:token})
+        // await user.save();
+        const params={
+            Source:process.env.EMAIL_FROM,
+            Destination:{ToAddresses:[email]},
+            ReplyToAddresses:[process.env.EMAIL_TO],
+            Message:{
+                Body:{
+                    Html:{
+                        Charset:"UTF-8",
+                        Data:`<html>
+                                <body>
+                                <h1>verify your email</h1>
+                                <p>use the link below</p>
+                                <p>${process.env.CLIENT_URL}/auth/password/reset/${token}</p>
+                                </body>
+                        </html>`
+                    }
+                },
+                Subject:{
+                    Charset:"UTF-8",
+                    Data:"complete reset password"
+                }
+            }
+        };
+        const sendEmail= ses.sendEmail(params).promise();
+        sendEmail.then(data=>{
+            console.log("emial is sent "+data)
+            res.status(200).json(`please check your box of email ${email} to compelet the registration`);
+    
+        }).catch(error=>{
+            console.log("error ",error)
+            res.status(400).json(`we couldn't verfiy this email ${email}`);
+    
+        })
+
+    }
+};
+
+exports.resetPassword = async(req, res) => {
+    const { resetPasswordLink, newPassword } = req.body;
+    if (resetPasswordLink) {
+        // check for expiry
+        JWT.verify(resetPasswordLink, process.env.LOGIN_USER, async(err, success) => {
+            if (err) {
+                return res.status(400).json({
+                    error: 'Expired Link. Try again.'
+                });
+            }
+            const user=await User.findOne({resetPasswordLink });
+            if(!user)
+            {
+                return res.status(400).json({
+                    error: 'Invalid token. Try again'
+                });
+            }
+            else
+            {
+                user.resetPasswordLink="";
+                user.password=newPassword;
+                user.save((err, result) => {
+                    if (err) {
+                        return res.status(400).json({
+                            error: 'Password reset failed. Try again'
+                        });
+                    }
+
+                    res.json({
+                        message: `Great! Now you can login with your new password`
+                    });
+                });
+            }
+        })
+    }
+};
