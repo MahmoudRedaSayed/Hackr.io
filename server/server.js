@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const ConnectDB=require("./config/db");
 const AuthRouter = require('./routes/auth');
 const UsersRouter = require('./routes/user');
+const categoryRoutes = require('./routes/category');
 require('dotenv').config();
 
 const app=express();
@@ -18,3 +19,4 @@ app.listen(port,()=>{
 })
 app.use("/api",AuthRouter)
 app.use("/api/users",UsersRouter)
+app.use('/api', categoryRoutes);

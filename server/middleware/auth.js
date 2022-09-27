@@ -25,7 +25,7 @@ exports.authMiddle=async(req,res,next)=>{
 
 exports.authMiddleAdmin=async(req,res,next)=>{
     try{
-        const user=await User.findById(req.user._id);
+        const user=await User.findById(req.auth._id);
         if(user&&user.role==="admin")
         {
             req.profile=user;
@@ -38,6 +38,7 @@ exports.authMiddleAdmin=async(req,res,next)=>{
     }
     catch(error)
     {
+        console.log(error)
         res.status(400).json("error in server")
     }
 }

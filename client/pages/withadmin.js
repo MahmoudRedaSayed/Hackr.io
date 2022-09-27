@@ -3,7 +3,7 @@ import { getCookie } from "../helpers/auth";
 import axios from "axios"
 const withAdmin = Page => {
     const WithAuthAdmin = props => <Page {...props} />;
-    WithAuthUser.getInitialProps = async context => {
+    WithAuthAdmin.getInitialProps = async context => {
         const token = getCookie('token', context.req);
         let user = null;
         if (token) {
