@@ -6,14 +6,14 @@ const { linkCreateValidator, linkUpdateValidator } = require('../validators/link
 const { runValidation } = require('../validators');
 
 // controllers
-const { requireSignin, authMiddleware } = require('../middleware/auth');
+const { requireSignin, authMiddle } = require('../middleware/auth');
 const { create, list, read, update, remove } = require('../controllers/link');
 
 // routes
-router.post('/link', linkCreateValidator, runValidation, requireSignin, authMiddleware, create);
+router.post('/link', linkCreateValidator, runValidation, requireSignin, authMiddle, create);
 router.get('/links', list);
 router.get('/link/:slug', read);
-router.put('/link/:slug', linkUpdateValidator, runValidation, requireSignin, authMiddleware, create);
-router.delete('/link/:slug', requireSignin, authMiddleware, remove);
+router.put('/link/:slug', linkUpdateValidator, runValidation, requireSignin, authMiddle, create);
+router.delete('/link/:slug', requireSignin, authMiddle, remove);
 
 module.exports = router;

@@ -7,7 +7,7 @@ exports.create = (req, res) => {
     const slug = url;
     let link = new Link({ title, url, categories, type, medium, slug });
     // posted by user
-    link.postedBy = req.user._id;
+    link.postedBy = req.auth._id;
     // save link
     link.save((err, data) => {
         if (err) {
