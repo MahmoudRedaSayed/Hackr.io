@@ -62,16 +62,23 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
 Links.getInitialProps = async ({ query, req }) => {
     let skip = 0;
     let limit = 2;
+    console.log("slug",query);
+    try{
 
-    const response = await axios.post(`http://localhost:5000/api/category/${query.slug}`, { skip, limit });
-    return {
-        query,
-        category: response.data.category,
-        links: response.data.links,
-        totalLinks: response.data.links.length,
-        linksLimit: limit,
-        linkSkip: skip
-    };
+        const response = await axios.post(`http://localhost:5000/api/category/${query.slug}`, { skip, limit });
+        return {
+            query,
+            category: response.data.category,
+            links: response.data.links,
+            totalLinks: response.data.links.length,
+            linksLimit: limit,
+            linkSkip: skip
+        };
+    }
+    catch(error)
+    {
+        console.log("this is error",error)
+    }
 };
 
 export default Links;
