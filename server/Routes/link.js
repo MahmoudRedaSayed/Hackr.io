@@ -15,5 +15,7 @@ router.get('/links', list);
 router.get('/link/:slug', read);
 router.put('/link/:slug', linkUpdateValidator, runValidation, requireSignin, authMiddle, create);
 router.delete('/link/:slug', requireSignin, authMiddle, remove);
+router.put('/click-count', clickCount);
+
 
 module.exports = router;
