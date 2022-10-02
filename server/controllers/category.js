@@ -4,6 +4,7 @@ const formidable = require('formidable');
 const {v4:uuidv4} = require('uuid');
 const AWS = require('aws-sdk');
 const fs = require('fs');
+const Link=require("../models/link")
 
 // s3
 

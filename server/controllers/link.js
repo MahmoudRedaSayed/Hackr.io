@@ -1,5 +1,6 @@
 const Link = require('../models/link');
 const slugify = require('slugify');
+const { findByIdAndUpdate } = require('../models/user');
 
 exports.create = (req, res) => {
     const { title, url, categories, type, medium } = req.body;
@@ -31,17 +32,19 @@ exports.list = (req, res) => {
 };
 
 
-exports.clickCount = (req, res) => {
-    const { linkId } = req.body;
-    Link.findByIdAndUpdate(linkId, { $inc: { clicks: 1 } }, { upsert: true, new: true }).exec((err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(400).json({
-                error: 'Could not update view count'
-            });
-        }
-        res.json(result);
-    });
+exports.clickCount = async (req, res) => {
+    try {
+        const { linkId } = req.body;
+        console.log("link is id",linkId);
+        const link=await Link.findByIdAndUpdate(linkId,{$inc: {clicks:1}  });
+        console.log(link)
+        res.status(200).json(link);
+    }
+    catch(error)
+    {
+        res.status(400).json("couldn't inc the clicks")
+    }
+
 };
 
 exports.read = (req, res) => {

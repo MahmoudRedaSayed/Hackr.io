@@ -33,7 +33,7 @@ const Layout = ({ children }) => {
         <ul className="nav nav-tabs nav-dark bg-dark" style={{padding:"10px"}}>
             <div style={{flexGrow:'1'}}>
 
-            <li className="nav-item" >
+            <li className="nav-item" style={{width:"fit-content"}} >
                 <Link href="/">
                     <a className="nav-link  ">Home</a>
                 </Link>

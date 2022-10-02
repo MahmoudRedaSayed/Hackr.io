@@ -13,18 +13,19 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
     const [size, setSize] = useState(totalLinks);
 
     const handleClick = async linkId => {
-        const response = await axios.put(`http://localhost:5000/click-count`, { linkId });
+        const response = await axios.put(`http://localhost:5000/api/click-count`, { linkId });
+        console.log(response)
         loadUpdatedLinks();
     };
 
     const loadUpdatedLinks = async () => {
-        const response = await axios.post(`http://localhost:5000/category/${query.slug}`);
+        const response = await axios.post(`http://localhost:5000/api/category/${query.slug}`);
         setAllLinks(response.data.links);
     };
 
     const listOfLinks = () =>
         allLinks.map((l, i) => (
-            <div className="row alert alert-primary p-2">
+            <div className="row alert alert-primary p-2" key={l._id}>
                 <div className="col-md-8" onClick={e => handleClick(l._id)}>
                     <a href={l.url} target="_blank">
                         <h5 className="pt-2">{l.title}</h5>
@@ -53,7 +54,8 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
 
     const loadMore = async () => {
         let toSkip = skip + limit;
-        const response = await axios.post(`http://localhost:5000/category/${query.slug}`, { skip: toSkip, limit });
+        console.log("the slug is ",query.slug)
+        const response = await axios.post(`http://localhost:5000/api/category/${query.slug}`, { skip: toSkip, limit });
         setAllLinks([...allLinks, ...response.data.links]);
         console.log('allLinks', allLinks);
         console.log('response.data.links.length', response.data.links.length);
@@ -100,7 +102,7 @@ Links.getInitialProps = async ({ query, req }) => {
     let skip = 0;
     let limit = 2;
 
-    const response = await axios.post(`http://localhost:5000/category/${query.slug}`, { skip, limit });
+    const response = await axios.post(`http://localhost:5000/api/category/${query.slug}`, { skip, limit });
     return {
         query,
         category: response.data.category,
