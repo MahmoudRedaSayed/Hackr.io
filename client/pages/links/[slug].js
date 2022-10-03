@@ -46,7 +46,7 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
                         {l.type} / {l.medium}
                     </span>
                     {l.categories.map((c, i) => (
-                        <span className="badge text-success">{c.name}</span>
+                        <span  key={c._id}className="badge text-success">{c.name}</span>
                     ))}
                 </div>
             </div>
@@ -76,7 +76,7 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
             </div>
             <br />
             <div className="row">
-                <div className="col-md-8">{listOfLinks()}</div>
+                {/* <div className="col-md-8">{listOfLinks()}</div> */}
                 <div className="col-md-4">
                     <h2 className="lead">Most popular in {category.name}</h2>
                     <p>show popular links</p>
@@ -90,8 +90,11 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
                         pageStart={0}
                         loadMore={loadMore}
                         hasMore={size > 0 && size >= limit}
-                        loader={<img src="/static/images/loading.gif" alt="loading" />}
-                    ></InfiniteScroll>
+                        loader={<img key={0} src="/static/images/loading.gif" alt="loading" />}
+                    >
+                <div className="col-md-8">{listOfLinks()}</div>
+
+                    </InfiniteScroll>
                 </div>
             </div>
         </Layout>

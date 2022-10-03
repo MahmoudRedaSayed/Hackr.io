@@ -9,10 +9,15 @@ const User = ({ user }) => (
         <br />
         <div className="row">
             <div className="col-md-4">
-                <ul className="nav flex-column">
+            <ul className="nav flex-column">
                     <li className="nav-item">
-                        <Link href="/admin/category/create">
-                            <a className="nav-link">Create category</a>
+                        <a href="/admin/category/create" className="nav-link text-dark">
+                            Create category
+                        </a>
+                    </li>
+                    <li className="nav-item">
+                        <Link href="/admin/category/read">
+                            <a className="nav-link text-dark">All categories</a>
                         </Link>
                     </li>
                 </ul>
