@@ -100,65 +100,71 @@ exports.read = (req, res) => {
         });
 };
 
-exports.update = (req, res) => {
+exports.update = async(req, res) => {
     const { slug } = req.params;
     const { name, image, content } = req.body;
 
     // image data
+    console.log("update",slug)
     const base64Data = new Buffer.from(image.replace(/^data:image\/\w+;base64,/, ''), 'base64');
     const type = image.split(';')[0].split('/')[1];
+    try{
 
-    Category.findOneAndUpdate({ slug }, { name, content }, { new: true }).exec((err, updated) => {
-        if (err) {
-            return res.status(400).json({
-                error: 'Could not find category to update'
-            });
-        }
-        console.log('UPDATED', updated);
-        if (image) {
-            // remove the existing image from s3 before uploading new/updated one
-            const deleteParams = {
-                Bucket: 'hackr-kaloraat',
-                Key: `${updated.image.key}`
-            };
-
-            s3.deleteObject(deleteParams, function(err, data) {
-                if (err) console.log('S3 DELETE ERROR DUING UPDATE', err);
-                else console.log('S3 DELETED DURING UPDATE', data); // deleted
-            });
-
-            // handle upload image
-            const params = {
-                Bucket: 'hackr-kaloraat',
-                Key: `category/${uuidv4()}.${type}`,
-                Body: base64Data,
-                ACL: 'public-read',
-                ContentEncoding: 'base64',
-                ContentType: `image/${type}`
-            };
-
-            s3.upload(params, (err, data) => {
-                if (err) {
-                    console.log(err);
-                    res.status(400).json({ error: 'Upload to s3 failed' });
-                }
-                console.log('AWS UPLOAD RES DATA', data);
-                updated.image.url = data.Location;
-                updated.image.key = data.Key;
-
-                // save to db
-                updated.save((err, success) => {
+        const category= await Category.findOneAndUpdate({ slug }, { name, content })
+        if(category)
+        {
+            if (image) {
+                // remove the existing image from s3 before uploading new/updated one
+                const deleteParams = {
+                    Bucket: 'react-aws-node-bucket',
+                    Key: `${category.image.key}`
+                };
+    
+                s3.deleteObject(deleteParams, function(err, data) {
+                    if (err) console.log('S3 DELETE ERROR DUING UPDATE', err);
+                    else console.log('S3 DELETED DURING UPDATE', data); // deleted
+                });
+    
+                // handle upload image
+                const params = {
+                    Bucket: 'react-aws-node-bucket',
+                    Key: `category/${uuidv4()}.${type}`,
+                    Body: base64Data,
+                    ACL: 'public-read',
+                    ContentEncoding: 'base64',
+                    ContentType: `image/${type}`
+                };
+    
+                s3.upload(params, (err, data) => {
                     if (err) {
                         console.log(err);
-                        res.status(400).json({ error: 'Duplicate category' });
+                        res.status(400).json({ error: 'Upload to s3 failed' });
                     }
-                    res.json(success);
+                    console.log('AWS UPLOAD RES DATA', data);
+                    category.image.url = data.Location;
+                    category.image.key = data.Key;
+    
+                    // save to db
+                    category.save((err, success) => {
+                        if (err) {
+                            console.log(err);
+                            res.status(400).json({ error: 'Duplicate category' });
+                        }
+                        res.json(success);
+                    });
                 });
-            });
-        } else {
-            res.json(updated);
+            } else {
+                res.json(category);
+            }
         }
-    });
+    }
+    catch(error){
+        console.log(error)
+        res.status(400).json({
+            error: 'Could not find category to update'
+        });
+    }
+
 };
 
 exports.remove = (req, res) => {
@@ -172,7 +178,7 @@ exports.remove = (req, res) => {
         }
         // remove the existing image from s3 before uploading new/updated one
         const deleteParams = {
-            Bucket: 'hackr-kaloraat',
+            Bucket: 'react-aws-node-bucket',
             Key: `${data.image.key}`
         };
 

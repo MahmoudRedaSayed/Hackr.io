@@ -13,7 +13,7 @@ const { create, list, read, update, remove } = require('../controllers/category'
 router.post('/category', categoryCreateValidator, runValidation, requireSignin, authMiddleAdmin, create);
 router.get('/categories', list);
 router.post('/category/:slug', read);
-router.put('/category/:slug', categoryUpdateValidator, runValidation, requireSignin, authMiddleAdmin, create);
+router.put('/category/:slug', categoryUpdateValidator, runValidation, requireSignin, authMiddleAdmin, update);
 router.delete('/category/:slug', requireSignin, authMiddleAdmin, remove);
 
 module.exports = router;

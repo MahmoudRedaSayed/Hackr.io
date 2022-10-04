@@ -77,8 +77,7 @@ const Update = ({ oldCategory, token }) => {
             setContent(response.data.content);
         } catch (error) {
             console.log('CATEGORY CREATE ERROR', error);
-            Swal.fire("oops",error.response.data.error,"error")
-            setState({ ...state, buttonText: 'Create', error: error.response.data.error });
+            Swal.fire("oops",error.response.data,"error")
         }
     };
 
@@ -120,8 +119,6 @@ const Update = ({ oldCategory, token }) => {
                 <div className="col-md-6 offset-md-3">
                     <h1>Update category</h1>
                     <br />
-                    {success && showSuccessMessage(success)}
-                    {error && showErrorMessage(error)}
                     {updateCategoryForm()}
                 </div>
             </div>

@@ -39,7 +39,7 @@ const Read = ({ user, token }) => {
                     Authorization: `Bearer ${token}`
                 }
             });
-            Swal.fire("congrates","the category is updated","success")
+            Swal.fire("congrates","the category is deleted","success")
             loadCategories();
         } catch (error) {
             Swal.fire("oops",error.response.data,"error")
