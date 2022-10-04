@@ -6,6 +6,7 @@ const withUser = Page => {
     WithAuthUser.getInitialProps = async context => {
         const token = getCookie('token', context.req);
         let user = null;
+        let userLinks = [];
         if (token) {
             try {
                 const response = await axios.get(`http://localhost:5000/api/users`, {
@@ -14,7 +15,9 @@ const withUser = Page => {
                         contentType: 'application/json'
                     }
                 });
-                user = response.data;
+                console.log("the response",response.data);
+                user = response.data.user;
+                userLinks=response.data.links
             } catch (error) {
                 console.log(error)
                 if (error.response.status === 401) {
@@ -33,6 +36,7 @@ const withUser = Page => {
             return {
                 ...(Page.getInitialProps ? await Page.getInitialProps(context) : {}),
                 user,
+                userLinks,
                 token
             };
         }

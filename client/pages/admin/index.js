@@ -3,7 +3,7 @@ import withAdmin from '../withadmin';
 import Layout from '../../components/Layout';
 import Link from 'next/link';
 
-const User = ({ user }) => (
+const Admin = ({ admin }) => (
     <Layout>
         <h1>Admin Dashboard</h1>
         <br />
@@ -26,4 +26,4 @@ const User = ({ user }) => (
         </div>
     </Layout>
 );
-export default withAdmin(User);
+export default withAdmin(Admin);

@@ -47,14 +47,52 @@ exports.clickCount = async (req, res) => {
 
 };
 
-exports.read = (req, res) => {
-    //
+exports.read = async(req, res) => {
+    const { id } = req.params;
+    console.log("the id of the link",id)
+    try{
+        const link=await Link.findById(id);
+        res.json(link)
+    }
+    catch(error)
+    {
+        res.status(400).json({
+            error: 'Error finding link'
+        });
+    }
 };
 
-exports.update = (req, res) => {
-    //
+exports.update = async(req, res) => {
+    const { id } = req.params;
+    const { title, url, categories, type, medium } = req.body;
+    const updatedLink = { title, url, categories, type, medium };
+    console.log("update link",id)
+    try{
+
+        const updated=await Link.findByIdAndUpdate(id,updatedLink);
+        res.status(200).json(updated);
+
+    }
+    catch(error)
+    {
+        console.log(error);
+        res.status(400).json({
+            error: 'Error updating the link'
+        });
+    }
 };
 
-exports.remove = (req, res) => {
-    //
+exports.remove = async (req, res) => {
+    const { id } = req.params;
+    try{
+        console.log("the id of the link",id)
+        await Link.findByIdAndDelete(id);
+        console.log("the link is deleted")
+        res.status(200).json("the link is deleted")
+    }
+    catch(error)
+    {
+        res.status(400).json("error in deleting the link")
+    }
+    
 };
