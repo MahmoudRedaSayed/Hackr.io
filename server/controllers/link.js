@@ -21,7 +21,14 @@ exports.create = (req, res) => {
 };
 
 exports.list = (req, res) => {
-    Link.find({}).exec((err, data) => {
+    let limit = req.body.limit ? parseInt(req.body.limit) : 10;
+    let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+    Link.find({}).populate('postedBy', 'name')
+    .populate('categories', 'name slug')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .exec((err, data) => {
         if (err) {
             return res.status(400).json({
                 error: 'Could not list links'
