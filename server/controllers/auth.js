@@ -9,15 +9,21 @@ AWS.config.update({
     secretAccessKey: process.env.AWS_ACCESS_SECRET,
     region: "us-east-1",
     });
+AWS.config.update({
+    accessKeyId: "AKIAZEDEI27HXBV7DYZ4",
+    secretAccessKey: "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",
+    region: "us-east-1",
+    });
+    
 const ses=new AWS.SES({apiVersion:"2010-12-01"})
 exports.register =async (req, res) => {
     console.log(process.env.AWS_REGION)
     console.log('REGISTER CONTROLLER', req.body);
-    const {email,password,name}=req.body;
+    const {email,password,name,categories}=req.body;
     const user=await User.find({email});
     if(user)
     {
-        const link =JWT.sign({email,password,name},process.env.ACTIVATE_EMAIL,{
+        const link =JWT.sign({email,password,name,categories},process.env.ACTIVATE_EMAIL,{
             expiresIn:"10m"
         })
 
@@ -73,7 +79,7 @@ exports.registerActivate=(req,res)=>{
             });
         }
 
-        const { name, email, password } = JWT.decode(token);
+        const { name, email, password,categories } = JWT.decode(token);
         const username = shortId.generate();
         const foundUser=await User.findOne({email});
         if(foundUser)
@@ -84,7 +90,7 @@ exports.registerActivate=(req,res)=>{
         }
         else
         {
-            const newUser = await  User.create({ username, name, email, password });
+            const newUser = await  User.create({ username, name, email, password ,categories});
             if(newUser)
             {
                 res.status(200).json("your email is activated");

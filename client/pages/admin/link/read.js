@@ -10,6 +10,7 @@ import { getCookie } from '../../../helpers/auth';
 import Swal from 'sweetalert2';
 
 const Links = ({ token, links, totalLinks, linksLimit, linkSkip }) => {
+    console.log("links from the read ",links)
     const [allLinks, setAllLinks] = useState(links);
     const [limit, setLimit] = useState(linksLimit);
     const [skip, setSkip] = useState(0);

@@ -1,7 +1,18 @@
 const Link = require('../models/link');
+const User=require("../models/user");
+const Category=require("../models/category");
+const AWS=require("aws-sdk")
 const slugify = require('slugify');
 const { findByIdAndUpdate } = require('../models/user');
 
+
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_ACCESS_SECRET,
+    region: "us-east-1",
+    });
+    
+const ses=new AWS.SES({apiVersion:"2010-12-01"})
 exports.create = (req, res) => {
     const { title, url, categories, type, medium } = req.body;
     // console.table({ title, url, categories, type, medium });
@@ -17,6 +28,70 @@ exports.create = (req, res) => {
             });
         }
         res.json(data);
+        User.find({ categories: { $in: categories } }).exec((err, users) => {
+            if (err) {
+                throw new Error(err);
+                console.log('Error finding users to send email on link publish');
+            }
+            Category.find({ _id: { $in: categories } }).exec((err, result) => {
+                data.categories = result;
+
+                for (let i = 0; i < users.length; i++) {
+                    const params={
+                        Source:process.env.EMAIL_FROM,
+                        Destination:{ToAddresses:[users[i].email]},
+                        ReplyToAddresses:[process.env.EMAIL_TO],
+                        Message:{
+                            Body:{
+                                Html:{
+                                    Charset:"UTF-8",
+                                    Data:`<html>
+                                    <h1>New link published</h1>
+                                    <p>A new link titled <b>${
+                                        data.title
+                                    }</b> has been just publihsed in the following categories.</p>
+                                    
+                                    ${data.categories
+                                        .map(c => {
+                                            return `
+                                            <div>
+                                                <h2>${c.name}</h2>
+                                                <img src="${c.image.url}" alt="${c.name}" style="height:50px;" />
+                                                <h3><a href="${process.env.CLIENT_URL}/links/${c.slug}">Check it out!</a></h3>
+                                            </div>
+                                        `;
+                                        })
+                                        .join('-----------------------')}
+        
+                                    <br />
+        
+                                    <p>Do not wish to receive notifications?</p>
+                                    <p>Turn off notification by going to your <b>dashboard</b> > <b>update profile</b> and <b>uncheck the categories</b></p>
+                                    <p>${process.env.CLIENT_URL}/user/profile/update</p>
+        
+                                </html>`
+                                }
+                            },
+                            Subject:{
+                                Charset:"UTF-8",
+                                Data:"new link is published"
+                            }
+                        }
+                    };
+                    const sendEmail = ses.sendEmail(params).promise();
+
+                    sendEmail
+                        .then(success => {
+                            console.log('email submitted to SES ', success);
+                            return;
+                        })
+                        .catch(failure => {
+                            console.log('error on email submitted to SES  ', failure);
+                            return;
+                        });
+                }
+            });
+        });
     });
 };
 

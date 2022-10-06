@@ -80,3 +80,12 @@ export const logout = () => {
     removeLocalStorage('user');
     Router.push('/login');
 };
+
+export const updateUser = (user, next) => {
+    if (process.browser) {
+        if (localStorage.getItem('user')) {
+            localStorage.setItem('user', JSON.stringify(user));
+            next();
+        }
+    }
+};

@@ -7,6 +7,7 @@ import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 
 const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => {
+    console.log("the data from the component is ",links)
     const [allLinks, setAllLinks] = useState(links);
     const [limit, setLimit] = useState(linksLimit);
     const [skip, setSkip] = useState(0);
@@ -36,7 +37,7 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
                 </div>
                 <div className="col-md-4 pt-2">
                     <span className="pull-right">
-                        {moment(l.createdAt).fromNow()} by {l.postedBy.name}
+                        {moment(l.createdAt).fromNow()} by {l?.postedBy?.name}
                     </span>
                     <br />
                     <span className="badge text-secondary pull-right">{l.clicks} clicks</span>
@@ -79,7 +80,7 @@ const Links = ({ query, category, links, totalLinks, linksLimit, linkSkip }) => 
                 {/* <div className="col-md-8">{listOfLinks()}</div> */}
                 <div className="col-md-4">
                     <h2 className="lead">Most popular in {category.name}</h2>
-                    <p>show popular links</p>
+                    <div>show popular links</div>
                 </div>
             </div>
 

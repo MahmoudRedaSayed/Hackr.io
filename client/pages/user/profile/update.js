@@ -1,33 +1,35 @@
-import { useState,useEffect } from 'react';
-import Layout from '../components/Layout';
-import axios from "axios";
-import Swal from "sweetalert2";
+import { useState, useEffect } from 'react';
+import Layout from '../../../components/Layout';
+import Router from 'next/router';
+import axios from 'axios';
+import { isAuth, updateUser } from '../../../helpers/auth';
+import withUser from '../../withUser';
+import Swal from 'sweetalert2';
 
-
-const Register = () => {
+const Profile = ({ user, token }) => {
     const [state, setState] = useState({
-        name: '',
-        email: '',
+        name: user.name,
+        email: user.email,
         password: '',
         error: '',
         success: '',
-        buttonText: 'Register',
+        buttonText: 'Update',
         loadedCategories: [],
-        categories: []
+        categories: user.categories
     });
 
-    const { name, email, password, error, success, buttonText,categories } = state;
+    const { name, email, password, error, success, buttonText, loadedCategories, categories } = state;
+
+    // load categories when component mounts using useEffect
     useEffect(() => {
         loadCategories();
     }, []);
 
     const loadCategories = async () => {
         const response = await axios.get(`http://localhost:5000/api/categories`);
-        setState({ ...state,loadedCategories: response.data });
+        setState({ ...state, loadedCategories: response.data });
     };
-    const handleChange = name => e => {
-        setState({ ...state, [name]: e.target.value, error: '', success: '', buttonText: 'Register' });
-    };
+
     const handleToggle = c => () => {
         // return the first index or -1
         const clickedCategory = categories.indexOf(c);
@@ -45,44 +47,58 @@ const Register = () => {
     // show categories > checkbox
     const showCategories = () => {
         return (
-            state.loadedCategories &&
-            state.loadedCategories.map((c, i) => (
+            loadedCategories &&
+            loadedCategories.map((c, i) => (
                 <li className="list-unstyled" key={c._id}>
-                    <input type="checkbox" onChange={handleToggle(c._id)} className="mr-2" />
+                    <input
+                        type="checkbox"
+                        onChange={handleToggle(c._id)}
+                        checked={categories.includes(c._id)}
+                        className="mr-2"
+                    />
                     <label className="form-check-label">{c.name}</label>
                 </li>
             ))
         );
     };
 
+    const handleChange = name => e => {
+        setState({ ...state, [name]: e.target.value, error: '', success: '', buttonText: 'Update' });
+    };
+
     const handleSubmit = async e => {
-       try{ e.preventDefault();
-        // console.table({ name, email, password });
-        const response =await axios
-            .post(`http://localhost:5000/api/register`, {
-                name,
-                email,
-                password,
-                categories
-            })
-            Swal.fire('congrates', response.data ,'success')
+        e.preventDefault();
+        setState({ ...state, buttonText: 'Updating...' });
+        try {
+            const response = await axios.put(
+                `http://localhost:5000/api/users`,
+                {
+                    name,
+                    password,
+                    categories
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            console.log(response);
+            updateUser(response.data, () => {
                 setState({
-                    name: '',
-                    email: '',
-                    password: '',
-                    error: '',
-                    success: '',
-                    buttonText: 'submitted'
-                })
-            }
-        catch(error)
-        {
-            console.log(error)
-            Swal.fire('Oops', error.response.data,'error')
+                    ...state,
+                    buttonText: 'Updated'
+                });
+            });
+            Swal.fire("congrates","Profile updated successfully","success")
+        } catch (error) {
+            console.log(error);
+            Swal.fire("oops",error.response.data.error,"error")
+            setState({ ...state, buttonText: 'Update'});
         }
     };
 
-    const registerForm = () => (
+    const updateForm = () => (
         <form onSubmit={handleSubmit}>
             <div className="form-group">
                 <input
@@ -91,6 +107,7 @@ const Register = () => {
                     type="text"
                     className="form-control"
                     placeholder="Type your name"
+                    required
                 />
             </div>
             <div className="form-group">
@@ -100,6 +117,8 @@ const Register = () => {
                     type="email"
                     className="form-control"
                     placeholder="Type your email"
+                    required
+                    disabled
                 />
             </div>
             <div className="form-group">
@@ -111,12 +130,14 @@ const Register = () => {
                     placeholder="Type your password"
                 />
             </div>
+
             <div className="form-group">
                 <label className="text-muted ml-4">Category</label>
                 <ul style={{ maxHeight: '100px', overflowY: 'scroll' }}>{showCategories()}</ul>
             </div>
+
             <div className="form-group">
-                <button className="btn btn-outline-dark">{buttonText}</button>
+                <button className="btn btn-outline-warning">{buttonText}</button>
             </div>
         </form>
     );
@@ -124,14 +145,12 @@ const Register = () => {
     return (
         <Layout>
             <div className="col-md-6 offset-md-3">
-                <h1>Register</h1>
+                <h1>Update Profile</h1>
                 <br />
-                {registerForm()}
-                <hr />
-                {JSON.stringify(state)}
+                {updateForm()}
             </div>
         </Layout>
     );
 };
 
-export default Register;
+export default withUser(Profile);
